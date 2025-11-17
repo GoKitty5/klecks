@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Use Node 18 which is compatible with the build setup
+  NODE_VERSION = "18"
+
+# Optional: can add headers or redirects if needed later
