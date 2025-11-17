@@ -247,12 +247,8 @@ export class KlApp {
 
     constructor(p: TKlAppParams) {
         this.embed = p.embed;
-        // default 2048, unless your screen is bigger than that (that computer then probably has the horsepower for that)
-        // but not larger than 4096 - a fairly arbitrary decision
-        const maxCanvasSize = Math.min(
-            4096,
-            Math.max(2048, Math.max(window.screen.width, window.screen.height)),
-        );
+        // max canvas size is 4096 x 4096 pixels
+        const maxCanvasSize = 4096;
         this.uiLayout = (
             this.embed
                 ? 'left'
