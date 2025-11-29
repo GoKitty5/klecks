@@ -67,14 +67,38 @@ export function newImageDialog(p: {
 
     widthInput.type = 'number';
     widthInput.min = '1';
-    widthInput.max = '' + maxCanvasSize;
+    // device-aware UI max: try WebGL MAX_TEXTURE_SIZE and navigator.deviceMemory
+    function detectDeviceCapabilities() {
+        let glMax = 0;
+        try {
+            const c = document.createElement('canvas');
+            const gl = (c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl')) as
+                | WebGLRenderingContext
+                | null;
+            if (gl) {
+                try {
+                    glMax = gl.getParameter((gl as any).MAX_TEXTURE_SIZE) as number;
+                } catch (e) {
+                    // ignore
+                }
+            }
+        } catch (e) {
+            // ignore
+        }
+        const deviceMemory = (navigator as any).deviceMemory || 4; // GB, best-effort
+        const memoryCap = deviceMemory >= 16 ? 16000 : deviceMemory >= 8 ? 8000 : deviceMemory >= 4 ? 6000 : 4096;
+        return { glMax, deviceMemory, memoryCap };
+    }
+    const _deviceInfo = detectDeviceCapabilities();
+    const uiMax = Math.max(1, Math.floor(Math.min(maxCanvasSize, _deviceInfo.glMax || Infinity, _deviceInfo.memoryCap)));
+    widthInput.max = '' + uiMax;
     css(widthInput, {
         width: '70px',
     });
 
     heightInput.type = 'number';
     heightInput.min = '1';
-    heightInput.max = '' + maxCanvasSize;
+    heightInput.max = '' + uiMax;
     heightInput.style.width = '70px';
     widthInput.value = '' + canvasWidth;
     heightInput.value = '' + canvasHeight;
@@ -134,6 +158,17 @@ export function newImageDialog(p: {
         presetLandscapeBtn,
         presetPortraitBtn,
     );
+
+    const capabilityWarning = BB.el({
+        textContent: '',
+        css: {
+            color: '#b55',
+            fontSize: '12px',
+            marginTop: '6px',
+            display: 'none',
+        },
+    });
+    templateWrapper.append(capabilityWarning);
 
     const templatePadding = 0;
 
@@ -340,6 +375,16 @@ export function newImageDialog(p: {
 
         let w = parseInt(widthInput.value);
         let h = parseInt(heightInput.value);
+        // show device capability warnings based on uiMax (detected) or soft threshold
+        if (typeof uiMax !== 'undefined' && (w > uiMax || h > uiMax)) {
+            capabilityWarning.textContent = 'Selected size may exceed device capabilities and could fail.';
+            capabilityWarning.style.display = '';
+        } else if (w > 4096 || h > 4096) {
+            capabilityWarning.textContent = 'Large sizes may be slow or unstable on some devices.';
+            capabilityWarning.style.display = '';
+        } else {
+            capabilityWarning.style.display = 'none';
+        }
         if (w < 1 || w > maxCanvasSize || h < 1 || h > maxCanvasSize) {
             if (w > maxCanvasSize) {
                 w = maxCanvasSize;
