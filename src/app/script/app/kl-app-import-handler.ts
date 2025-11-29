@@ -454,7 +454,7 @@ export class KlAppImportHandler {
                 ((f) => {
                     const loaderSizeBytes = 1024 * 1024 * 25; // 25mb
                     const maxSizeBytes = 1024 * 1024 * 1024; // 1gb
-                    const maxResolution = 4096;
+                    const maxResolution = 8000;
 
                     if (f.size >= maxSizeBytes) {
                         // pretty likely to break stuff

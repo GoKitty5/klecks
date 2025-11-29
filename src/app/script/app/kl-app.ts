@@ -247,8 +247,8 @@ export class KlApp {
 
     constructor(p: TKlAppParams) {
         this.embed = p.embed;
-        // max canvas size is 4096 x 4096 pixels
-        const maxCanvasSize = 4096;
+        // max canvas size is 8000 x 8000 pixels
+        const maxCanvasSize = 8000;
         this.uiLayout = (
             this.embed
                 ? 'left'
