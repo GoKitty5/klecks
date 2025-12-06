@@ -28,6 +28,7 @@
     "mdn-polyfills": "5.20.0",
     "parcel": "2.16.0",
     "polygon-clipping": "0.15.7",
+    "puppeteer": "^24.32.0",
     "transformation-matrix": "3.1.0"
   }
 }
